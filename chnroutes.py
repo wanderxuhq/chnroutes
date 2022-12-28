@@ -152,6 +152,21 @@ def generate_win(metric):
     print("For pptp on windows only, run vpnup.bat before dialing to vpn," \
           "and run vpndown.bat after disconnected from the vpn.")
 
+def generate_cmroute(metric):
+    results = fetch_ip_data()  
+    
+    upfile=open('add.txt','w')
+    downfile=open('del.txt','w')
+    
+    for ip,mask,_ in results:
+        upfile.write('add %s mask %s default METRIC default IF default\n'%(ip,mask))
+        downfile.write('delete %s mask %s default METRIC default IF default\n'%(ip,mask))
+    
+    upfile.close()
+    downfile.close()
+    
+    print("For cmroute on windows only.")
+
 def generate_android(metric):
     results = fetch_ip_data()
     
@@ -255,6 +270,8 @@ if __name__=='__main__':
         generate_win(args.metric)
     elif args.platform.lower() == 'android':
         generate_android(args.metric)
+    elif args.platform.lower() == 'cmroute':
+        generate_cmroute(args.metric)
     else:
         print>>sys.stderr, "Platform %s is not supported."%args.platform
         exit(1)
